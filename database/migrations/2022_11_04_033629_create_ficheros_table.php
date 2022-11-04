@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFicheroesTable extends Migration
+class CreateFicherosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateFicheroesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('ficheroes')) {
-            Schema::create('ficheroes', function (Blueprint $table) {
+        if (!Schema::hasTable('ficheros')) {
+            Schema::create('ficheros', function (Blueprint $table) {
                 $table->id();
                 $table->string('description', 150);
                 $table->string('file', 250);
@@ -31,6 +31,6 @@ class CreateFicheroesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ficheroes');
+        Schema::dropIfExists('ficheros');
     }
 }

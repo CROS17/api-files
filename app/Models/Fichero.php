@@ -9,9 +9,19 @@ class Fichero extends Model
 {
     use HasFactory;
 
+    protected $table = 'ficheros';
+
     protected $fillable = [
         'description',
         'file'
     ];
+
+    public function scopeSearching($query, $que)
+    {
+        if ($que) {
+            return $query->where('id', 'like', "%$que%")
+                ->orWhere('description', 'like', "%$que%");
+        }
+    }
 
 }

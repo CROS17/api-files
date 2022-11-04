@@ -7,23 +7,37 @@ use App\Http\Resources\FicheroCollection;
 use App\Http\Resources\FicheroResource;
 use App\Models\Fichero;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class FicheroController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['indexAll']]);
+
+    }
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
-        $ficheros = Fichero::all();
-        return new FicheroCollection(
-            $ficheros->paginate(
-                env('FILES_PER_PAGE', request('per_page'))
-            )
-        );
+        try{
+
+            $paginate = request('paginate');
+            $ordercolumn = request('ordercolumn');
+            $order = request('order');
+            $query = request('query');
+            $ficheros = Fichero::searching($query)->orderBy($ordercolumn ?? 'id', $order ?? 'ASC')->paginate($paginate ?? 5);
+            return compact('ficheros');
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
@@ -31,23 +45,21 @@ class FicheroController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(FicheroRequest $request)
     {
-
-        $fichero = new Fichero($request->all());
-        if ($request->hasFile('file')) {
-            $path = $request->file->store('public/file-users');
-        }
-
-        $fichero->file = 'file-users/' . basename($path);
+        $description = $request->file('file')->getClientOriginalDescription();
+        $path = $request->file('file')->store('public/file-users');
+        $fichero = new Fichero;
+        $fichero->description = $description;
+        $fichero->file = $path;
         $fichero->save();
 
         return response()->json([
             'status' => true,
             'message' => "File uploaded successfully!"
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
 
@@ -55,14 +67,14 @@ class FicheroController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Fichero $fichero)
     {
         //
 //        return $fichero;
         return response()->json(
-            new FicheroResource($fichero), 200
+            new FicheroResource($fichero), Response::HTTP_OK
         );
 
     }
@@ -72,7 +84,7 @@ class FicheroController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(FicheroRequest $request, Fichero $fichero)
     {
@@ -82,14 +94,14 @@ class FicheroController extends Controller
         return response()->json([
             'status' => true,
             'message' => "File Updated successfully!"
-        ], 200);
+        ], Response::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Fichero $fichero)
     {
@@ -100,7 +112,26 @@ class FicheroController extends Controller
 
         return response()->json([
             'status' => true,
+            'message' => "file unsubscribed successfully!",
+        ], Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Fichero  $fichero
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function delete(Fichero $fichero)
+    {
+        //
+        $record = Fichero::query()->findOrFail($fichero);
+        $record->delete();
+
+        return response()->json([
+            'status' => true,
             'message' => "File Deleted successfully!",
-        ], 204);
+        ], Response::HTTP_NO_CONTENT);
     }
 }
