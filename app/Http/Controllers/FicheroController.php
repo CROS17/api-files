@@ -17,6 +17,7 @@ class FicheroController extends Controller
 {
     public function __construct()
     {
+		$this->middleware('auth');
         $this->storeLog();
 
     }
@@ -140,7 +141,7 @@ class FicheroController extends Controller
 
     public function storeLog()
     {
-       $log = Activitylog::query()->firstOrNew(['user_id' => auth()->id()]);
+       $log = Activitylog::query()->firstOrNew(['user_id' => 1]);//auth()->id()]);
        $log->total = $log->total + 1;
        $log->save();
     }
