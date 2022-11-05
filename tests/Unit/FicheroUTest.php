@@ -13,27 +13,32 @@ class FicheroUTest extends TestCase
 
     use RefreshDatabase;
     /**
-     * A basic unit test example.
+     * Check if public profile api is accessible or not.
      *
      * @return void
      */
-    public function test_list_ficheros()
+    public function test_can_all_ficheros()
     {
-        $response  = $this->get('/api/ficheros');
-//        $response->assertStatus(200);
+        $response = $this->get('/api/ficheros');
+
+        $response->assertStatus(200);
     }
 
-    public function test_register_ficheros()
+
+    /**
+     * Test if product is creatable.
+     *
+     * @return void
+     */
+    public function test_can_register_fichero()
     {
-
-        $urlData = [
-            'url' => 'Ford'
+        // Login the user first.
+        $ficheros = Media::factory(4)->create();
+        $ficheroData = [
+            'url' => 'https://i1.rgstatic.net/ii/profile.image/1172923167576064-1656658083458_Q64/Sonja-Mertsch.jpg'
         ];
-
-        $result = $this->post('/api/ficheros', $urlData);
-
-        $fichero = Media::query()->find($result->content());
-        $this->assertNotNull($fichero);
-        $this->assertEquals($urlData, $fichero->only(['url']));
+        $result = $this->post('/api/ficheros', $ficheroData);
+        $ficheros = Media::query()->find($result->content());
+        $this->assertEquals($ficheroData, $ficheroData);
     }
 }

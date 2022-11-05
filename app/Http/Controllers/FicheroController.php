@@ -140,10 +140,9 @@ class FicheroController extends Controller
 
     public function storeLog()
     {
-        // log = Activitylog::query()->firstOrNew(['user_id' => 1]);
-        $log = Activitylog::query()->firstOrNew(['user_id' => auth()->id()]);
-        $log->total = $log->total + 1;
-        $log->save();
+       $log = Activitylog::query()->firstOrNew(['user_id' => auth()->id()]);
+       $log->total = $log->total + 1;
+       $log->save();
     }
 
 }

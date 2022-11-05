@@ -38,8 +38,6 @@ use Illuminate\Support\Facades\Route;
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::get('/user-profile', [AuthController::class, 'userProfile']);
         });
-
-
         /**
          * Media Module
          */
