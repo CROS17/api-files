@@ -5,133 +5,145 @@ namespace App\Http\Controllers;
 use App\Http\Requests\FicheroRequest;
 use App\Http\Resources\FicheroCollection;
 use App\Http\Resources\FicheroResource;
-use App\Models\Fichero;
+use App\Models\Activitylog;
+use App\Models\Media;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FicheroController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['indexAll']]);
+        $this->storeLog();
 
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
+    /** List Media **/
     public function index()
     {
-        try{
+        try {
 
             $paginate = request('paginate');
             $ordercolumn = request('ordercolumn');
             $order = request('order');
             $query = request('query');
-            $ficheros = Fichero::searching($query)->orderBy($ordercolumn ?? 'id', $order ?? 'ASC')->paginate($paginate ?? 5);
-            return compact('ficheros');
+
+            $ficheros = Media::searching($query)->orderBy($ordercolumn ?? 'id', $order ?? 'ASC')->paginate($paginate ?? 5);
+
+            return FicheroCollection::make($ficheros);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+
         }
-        catch (\Exception $e) {
+
+
+    }
+
+    /** register media **/
+    public function store(FicheroRequest $request)
+    {
+
+        try {
+
+            $files = $request->validated()['files'];
+
+            foreach ($files as $file) {
+                $path = $file->store('public/file-users');
+                Media::create([
+                    'url' => $path
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => "File uploaded successfully!"
+            ], Response::HTTP_CREATED);
+
+
+        } catch (\Exception $e) {
+
             return response()->json([
                 'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    /** show one media **/
+    public function show(Media $fichero)
+    {
+        return FicheroResource::make($fichero);
+    }
+
+    /** update media **/
+    public function update(FicheroRequest $request, Media $fichero)
+    {
+
+
+        try {
+
+            if($fichero->url){
+                Storage::delete($fichero->url);
+            }
+
+            $path = $request->file('url')->store('public/file-users');
+            $fichero->update([
+                'file' => $path
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => "File Updated successfully!"
+            ], Response::HTTP_OK);
+
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(FicheroRequest $request)
+    /** delete logica media **/
+    public function delete(Media $fichero)
     {
-        $description = $request->file('file')->getClientOriginalDescription();
-        $path = $request->file('file')->store('public/file-users');
-        $fichero = new Fichero;
-        $fichero->description = $description;
-        $fichero->file = $path;
-        $fichero->save();
+
+        $fichero = Media::query()->findOrFail($fichero->id);
+        $fichero->delete();
 
         return response()->json([
             'status' => true,
-            'message' => "File uploaded successfully!"
-        ], Response::HTTP_CREATED);
-    }
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Fichero $fichero)
-    {
-        //
-//        return $fichero;
-        return response()->json(
-            new FicheroResource($fichero), Response::HTTP_OK
-        );
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(FicheroRequest $request, Fichero $fichero)
-    {
-        //
-        $fichero->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'message' => "File Updated successfully!"
-        ], Response::HTTP_OK);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(Fichero $fichero)
-    {
-        //
-        $fichero->update([
-            'status' => 0
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => "file unsubscribed successfully!",
+            'message' => "file Deleted successfully!",
         ], Response::HTTP_NO_CONTENT);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Fichero  $fichero
-     * @return \Illuminate\Http\JsonResponse
-     */
-
-    public function delete(Fichero $fichero)
+    /** destroy fisica media **/
+    public function destroy(Media $fichero)
     {
-        //
-        $record = Fichero::query()->findOrFail($fichero);
-        $record->delete();
+
+        DB::table('media')->delete($fichero->id);
 
         return response()->json([
             'status' => true,
-            'message' => "File Deleted successfully!",
+            'message' => "File Destroy successfully!",
         ], Response::HTTP_NO_CONTENT);
     }
+
+    public function storeLog()
+    {
+        // log = Activitylog::query()->firstOrNew(['user_id' => 1]);
+        $log = Activitylog::query()->firstOrNew(['user_id' => auth()->id()]);
+        $log->total = $log->total + 1;
+        $log->save();
+    }
+
 }

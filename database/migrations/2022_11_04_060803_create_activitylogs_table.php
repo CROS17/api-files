@@ -16,8 +16,7 @@ class CreateActivitylogsTable extends Migration
         Schema::create('activitylogs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('activity');
-            $table->string('table_name');
+            $table->string('total');
             $table->timestamps();
         });
     }

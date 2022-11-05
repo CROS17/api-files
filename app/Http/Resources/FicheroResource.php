@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class FicheroResource extends JsonResource
 {
@@ -16,8 +17,7 @@ class FicheroResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'description' => $this->description,
-            'file' => $this->file,
+            'url' => asset(Storage::url($this->url)),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

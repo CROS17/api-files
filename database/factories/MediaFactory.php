@@ -3,8 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
 
-class FicheroFactory extends Factory
+class MediaFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -13,8 +14,12 @@ class FicheroFactory extends Factory
      */
     public function definition()
     {
+//        $filepath = storage_path('file-users');
+
+
         return [
             //
+            'url' => $this->faker->imageUrl(100, 100)
         ];
     }
 }

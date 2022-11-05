@@ -24,9 +24,15 @@ class FicheroRequest extends FormRequest
     public function rules()
     {
         return [
-            //
-            'description' => 'min:3|max:150',
-            'file' => 'required|size:500'
+
+            'files' => [
+                'required',
+                'array'
+            ],
+            'files.*' => [
+                'file',
+                'size:500'
+            ]
         ];
     }
 }

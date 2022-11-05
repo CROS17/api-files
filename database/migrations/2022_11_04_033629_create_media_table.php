@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFicherosTable extends Migration
+class CreateMediaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateFicherosTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('ficheros')) {
-            Schema::create('ficheros', function (Blueprint $table) {
+        if (!Schema::hasTable('media')) {
+            Schema::create('media', function (Blueprint $table) {
                 $table->id();
-                $table->string('description', 150);
-                $table->string('file', 250);
-                $table->tinyInteger('status')->default(1);
+                $table->string('url', 250);
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
     }
@@ -31,6 +30,6 @@ class CreateFicherosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ficheros');
+        Schema::dropIfExists('media');
     }
 }

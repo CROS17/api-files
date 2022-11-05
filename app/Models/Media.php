@@ -4,23 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Fichero extends Model
+class Media extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
-    protected $table = 'ficheros';
+    protected $table = 'media';
 
     protected $fillable = [
-        'description',
-        'file'
+        'url'
     ];
 
     public function scopeSearching($query, $que)
     {
         if ($que) {
             return $query->where('id', 'like', "%$que%")
-                ->orWhere('description', 'like', "%$que%");
+                ->orWhere('url', 'like', "%$que%");
         }
     }
 

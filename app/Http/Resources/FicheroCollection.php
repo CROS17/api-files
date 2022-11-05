@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Storage;
 
 class FicheroCollection extends ResourceCollection
 {
@@ -17,8 +18,8 @@ class FicheroCollection extends ResourceCollection
         return $this->collection->transform(function($row, $key) {
             return [
                 'id' => $row->id,
-                'description' => $row->description,
-                'file' => $row->file
+//                'description' => $row->description,
+                'file' => asset(Storage::url($row->url))
             ];
         });
     }

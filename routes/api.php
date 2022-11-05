@@ -16,30 +16,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
+
         /** varibles rate limiting **/
     $cantPeticiones = env('CANTIDAD_PETICIONES_RUTA');
     $timeRuta = env('TIME_RUTA');
 
+
+
+
     Route::group([
-        'middleware' => 'api',
-        'prefix' => 'auth'
-    ], function ($router) {
+        'middleware' => 'api'
+    ], function ($router) use ($timeRuta, $cantPeticiones) {
 
-        /**  user login **/
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/refresh', [AuthController::class, 'refresh']);
-        Route::get('/user-profile', [AuthController::class, 'userProfile']);
+        /**
+         * Authentication Module
+         */
+        Route::group(['prefix' => 'auth'], function() {
+            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/refresh', [AuthController::class, 'refresh']);
+            Route::get('/user-profile', [AuthController::class, 'userProfile']);
+        });
 
 
-        /**  user files **/
-    });
-
-//        Route::middleware(['auth'])->group(function () {});
+        /**
+         * Media Module
+         */
         Route::middleware("throttle:".$cantPeticiones.','.$timeRuta)->group(function () {
             Route::get('/ficheros', [FicheroController::class, 'index']);
             Route::get('/ficheros/{fichero}', [FicheroController::class, 'show']);
@@ -47,8 +50,11 @@ use Illuminate\Support\Facades\Route;
 
         Route::post('/ficheros', [FicheroController::class, 'store']);
         Route::put('/ficheros/{fichero}', [FicheroController::class, 'update']);
-        Route::delete('/ficheros/{fichero}', [FicheroController::class, 'destroy']);
-        Route::delete('/ficheros/{fichero}', [FicheroController::class, 'delete']);
+        Route::delete('/ficheros-logica/{fichero}', [FicheroController::class, 'delete']);
+        Route::delete('/ficheros-fisica/{fichero}', [FicheroController::class, 'destroy']);
 
-//        Route::apiResource('/ficheros', FicheroController::class);
+    });
+
+
+
 
