@@ -4,28 +4,34 @@
 
  #Postman User
  Register User
-(https://github.com/CROS17/api-files/imagenes-postman/register.png)
+  ![register](
+https://github.com/CROS17/api-files/blob/mainimagenes-postman/register.png)
 
 Perfil User
-(https://github.com/CROS17/api-files/imagenes-postman/perfil.png)
+ ![perfil](
+https://github.com/CROS17/api-files/blob/main/images-postman/perfil.png)
 
-Login USer
+Login Uer
  ![login](
 https://github.com/CROS17/api-files/blob/main/images-postman/login.png)
 
 Logout User
-(https://github.com/CROS17/api-files/imagenes-postman/logout.png)
+ ![logout](
+https://github.com/CROS17/api-files/imagenes-postman/logout.png)
 
  #Postman Files
 
  Register Files
-(https://github.com/CROS17/api-files/imagenes-postman/register-file.png)
+ ![register-file](
+	https://github.com/CROS17/api-files/imagenes-postman/register-file.png)
 
  Listado Files
-(https://github.com/CROS17/api-files/imagenes-postman/listar-files.png)
+  ![listar-file](
+ https://github.com/CROS17/api-files/imagenes-postman/listar-files.png)
 
  Eliminar Files
-(https://github.com/CROS17/api-files/imagenes-postman/delet-files.png)
+![delete-files](
+	https://github.com/CROS17/api-files/imagenes-postman/delet-files.png)
 
 
 <!-- linkendin  -->
